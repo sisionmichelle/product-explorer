@@ -1,4 +1,4 @@
-function ProductCard({ product, onClick }) {
+function ProductCard({ product, onClick, onFavoriteClick, isFavorite, onAddToCart, quantity, onIncrease, onDecrease }) {
   return (
     <div className="product-card" onClick={onClick}>
       <img
@@ -7,9 +7,66 @@ function ProductCard({ product, onClick }) {
         width="150"
       />
       <h2>{product.title}</h2>
-      <p>Category: {product.category}</p>
-      <p>Price: Ksh {product.price}</p>
-      <p>Rating: ⭐ {product.rating.rate}</p>
+      <div className="product-actions">
+        <button
+        className="favorite-btn"
+        onClick={(e)=>{
+          e.stopPropagation();
+          onFavoriteClick();
+
+        }}
+        >
+           {isFavorite ? "❤️" : "🤍"}
+        </button>
+       {quantity===0? (
+        <button
+        onClick={(e)=>{
+          e.stopPropagation();
+          onAddToCart();
+        }}
+        >
+         🛒 Add to Cart 
+        </button>
+       ):(
+         <div className="quality-controls">
+    <button
+  onClick={(e) => {
+    e.stopPropagation();
+    onDecrease();
+  }}
+>
+  ➖
+</button>
+
+<span>{quantity}</span>
+
+<button
+  onClick={(e) => {
+    e.stopPropagation();
+    onIncrease();
+  }}
+>
+  ➕
+</button>
+  </div>
+       )
+       }
+    </div>  
+     <div className="product-details">
+
+  <p className="category">
+    {product.category}
+  </p>
+
+  <p className="rating">
+    ⭐ {product.rating.rate}
+  </p>
+
+  <p className="price">
+    Ksh {product.price}
+  </p>
+
+</div>
     </div>
   );
 }
