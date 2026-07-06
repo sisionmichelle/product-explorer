@@ -1,4 +1,15 @@
-function ProductCard({ product, onClick, onFavoriteClick, isFavorite, onAddToCart, quantity, onIncrease, onDecrease }) {
+function ProductCard({
+  product,
+  onClick,
+  onFavoriteClick,
+  isFavorite,
+  onAddToCart,
+  quantity,
+  onIncrease,
+  onDecrease,
+  onEdit,
+  onDelete,
+}) {
   return (
     <div className="product-card" onClick={onClick}>
       <img
@@ -6,67 +17,85 @@ function ProductCard({ product, onClick, onFavoriteClick, isFavorite, onAddToCar
         alt={product.title}
         width="150"
       />
+
       <h2>{product.title}</h2>
+
+      <p>Category: {product.category}</p>
+
+      <p className="price">Ksh {product.price}</p>
+
+      <p>⭐ {product.rating.rate}</p>
+
+      {/* Favorite */}
       <div className="product-actions">
         <button
-        className="favorite-btn"
-        onClick={(e)=>{
-          e.stopPropagation();
-          onFavoriteClick();
-
-        }}
+          className="favorite-btn"
+          onClick={(e) => {
+            e.stopPropagation();
+            onFavoriteClick();
+          }}
         >
-           {isFavorite ? "❤️" : "🤍"}
+          {isFavorite ? "❤️" : "🤍"}
         </button>
-       {quantity===0? (
+      </div>
+
+      {/* Cart Controls */}
+      {quantity === 0 ? (
         <button
-        onClick={(e)=>{
-          e.stopPropagation();
-          onAddToCart();
-        }}
+          className="add-cart-btn"
+          onClick={(e) => {
+            e.stopPropagation();
+            onAddToCart();
+          }}
         >
-         🛒 Add to Cart 
+          🛒 Add to Cart
         </button>
-       ):(
-         <div className="quality-controls">
-    <button
-  onClick={(e) => {
-    e.stopPropagation();
-    onDecrease();
-  }}
->
-  ➖
-</button>
+      ) : (
+        <div className="quantity-controls">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onDecrease();
+            }}
+          >
+            ➖
+          </button>
 
-<span>{quantity}</span>
+          <span>{quantity}</span>
 
-<button
-  onClick={(e) => {
-    e.stopPropagation();
-    onIncrease();
-  }}
->
-  ➕
-</button>
-  </div>
-       )
-       }
-    </div>  
-     <div className="product-details">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onIncrease();
+            }}
+          >
+            ➕
+          </button>
+        </div>
+      )}
 
-  <p className="category">
-    {product.category}
-  </p>
+      {/* Edit & Delete */}
+      <div className="admin-actions">
+        <button
+          className="edit-btn"
+          onClick={(e) => {
+            e.stopPropagation();
+            onEdit();
+          }}
+        >
+          ✏️ Edit
+        </button>
 
-  <p className="rating">
-    ⭐ {product.rating.rate}
-  </p>
-
-  <p className="price">
-    Ksh {product.price}
-  </p>
-
-</div>
+        <button
+          className="delete-btn"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete();
+          }}
+        >
+          🗑️ Delete
+        </button>
+      </div>
     </div>
   );
 }

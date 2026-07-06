@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import ProductCard from "../components/ProductCard";
 import "../App.css";
 import { useNavigate } from "react-router-dom";
+import logo from "../assets/logo.png.png";
 
 
 function Home() {
@@ -46,6 +47,11 @@ const [recentlyViewed, setRecentlyViewed] = useState(() => {
   const saved = localStorage.getItem("recentlyViewed");
   return saved ? JSON.parse(saved) : [];
 });
+const [editingProduct, setEditingProduct] = useState(null);
+
+const [editedTitle, setEditedTitle] = useState("");
+
+const [editedPrice, setEditedPrice] = useState("");
   
  useEffect(() => {
   setLoading(true);
@@ -191,6 +197,66 @@ function decreaseQuantity(product) {
     );
   }
 }
+function deleteProduct(id) {
+  const confirmed = window.confirm(
+    "Are you sure you want to delete this product?"
+  );
+
+  if (!confirmed) return;
+
+  fetch(`https://fakestoreapi.com/products/${id}`, {
+    method: "DELETE",
+  })
+    .then((response) => response.json())
+    .then(() => {
+      setProducts(
+        products.filter((product) => product.id !== id)
+      );
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
+function updateProduct() {
+  fetch(
+    `https://fakestoreapi.com/products/${editingProduct.id}`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ...editingProduct,
+        title: editedTitle,
+        price: Number(editedPrice),
+      }),
+    }
+  )
+    .then((response) => response.json())
+    .then((updatedProduct) => {
+      setProducts(
+        products.map((product) =>
+          product.id === editingProduct.id
+            ? {
+                ...product,
+                title: updatedProduct.title,
+                price: updatedProduct.price,
+              }
+            : product
+        )
+      );
+
+      setEditingProduct(null);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
+function openEditModal(product) {
+  setEditingProduct(product);
+  setEditedTitle(product.title);
+  setEditedPrice(product.price);
+}
 const total = cart.reduce(
   (sum, item) => sum + item.price * item.quantity,
   0
@@ -246,7 +312,14 @@ if (error) {
    <div className={`app-container ${darkMode ? "dark" : ""}`}>
       <div className="header">
         <div>
-  <h1>Product Explorer</h1>
+  <div className="logo">
+  <img src={logo} alt="Insta Find Logo" />
+
+  <div>
+    <h1>Product Explorer</h1>
+    <p>Explore • Discover • Shop</p>
+  </div>
+</div>
   <p>Discover amazing products</p>
     </div>
     <div className="header-icons">
@@ -329,6 +402,9 @@ onClick={()=> setDarkMode(!darkMode)}
             onIncrease={() => increaseQuantity(product)}
             onDecrease={() => decreaseQuantity(product)}
             quantity={cartItem ? cartItem.quantity : 0}
+            onEdit={() => openEditModal(product)}
+            onDelete={() => deleteProduct(product.id)}
+            
           />
         </div>
       );
@@ -380,6 +456,42 @@ onClick={()=> setDarkMode(!darkMode)}
               </div>
             </div>
           )}
+          {editingProduct && (
+  <div className="modal">
+    <div className="modal-content">
+      <h2>✏️ Edit Product</h2>
+
+      <input
+        type="text"
+        value={editedTitle}
+        onChange={(e) => setEditedTitle(e.target.value)}
+        placeholder="Product Title"
+      />
+
+      <input
+        type="number"
+        value={editedPrice}
+        onChange={(e) => setEditedPrice(e.target.value)}
+        placeholder="Price"
+      />
+
+      <div style={{ marginTop: "20px" }}>
+        <button
+          className="checkout-btn"
+          onClick={updateProduct}
+        >
+          Save Changes
+        </button>
+
+        <button
+          onClick={() => setEditingProduct(null)}
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
           {showCart && (
   <div className="cart-sidebar">
     <h2>🛒 Shopping Cart</h2>
